@@ -175,6 +175,28 @@ textarea{resize:vertical;min-height:60px;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+/* UNDO TOAST */
+#undoToast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px 20px;display:flex;align-items:center;gap:14px;font-size:13px;z-index:9999;transition:transform .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+#undoToast.show{transform:translateX(-50%) translateY(0);}
+#undoToast .undo-msg{color:var(--text);}
+#undoToast .undo-btn{background:var(--accent);color:var(--bg);border:none;border-radius:6px;padding:5px 14px;font-weight:700;font-size:12px;cursor:pointer;}
+#undoToast .undo-close{color:var(--muted);cursor:pointer;font-size:16px;line-height:1;}
+/* EDIT MODAL inline */
+.edit-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.edit-field label{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+/* CHECKBOX COLUMN */
+.cb-col{width:36px;text-align:center;}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;}
+/* AUTOCOMPLETE */
+.autocomplete-wrap{position:relative;}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:7px;max-height:160px;overflow-y:auto;z-index:200;margin-top:2px;}
+.autocomplete-item{padding:8px 12px;font-size:13px;cursor:pointer;transition:background .1s;}
+.autocomplete-item:hover{background:var(--surface2);color:var(--accent);}
+/* DATE RANGE FILTER */
+.date-filter{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.date-filter input{width:130px;min-width:unset;}
+/* PRINT */
+@media print{header,#undoToast,.btn-group,.search-row,.nav-tabs,.header-right,#viewerBanner,#editorSyncBar{display:none!important;}.page{display:block!important;}}
 </style>
 </head>
 <body>
@@ -198,6 +220,13 @@ textarea{resize:vertical;min-height:60px;}
      MAIN APP (hidden until login)
 ══════════════════════════════════════ -->
 <div id="appShell" style="display:none;">
+
+<!-- UNDO TOAST -->
+<div id="undoToast">
+  <span class="undo-msg" id="undoMsg">Action undone</span>
+  <button class="undo-btn" onclick="doUndo()">↩ Undo</button>
+  <span class="undo-close" onclick="hideUndo()">✕</span>
+</div>
 
 <div id="viewerBanner" style="display:none;">
   <span>👁 VIEW ONLY MODE — You do not have edit access</span>
@@ -286,9 +315,11 @@ textarea{resize:vertical;min-height:60px;}
     <input class="search-input" type="text" placeholder="Search name, article, party…" id="sampleSearch" oninput="renderSamples()">
     <select class="filter-select" id="sampleRoleFilter" onchange="renderSamples()"><option value="">All Roles</option><option value="SO">SO — Sales Officer</option><option value="RM">RM — Regional Manager</option></select>
     <select class="filter-select" id="sampleStatusFilter" onchange="renderSamples()"><option value="">All Status</option><option value="out">With Rep</option><option value="returned">Returned</option><option value="overdue">Overdue</option></select>
+    <div class="date-filter">From:<input type="date" id="filterFrom" onchange="renderSamples()"> To:<input type="date" id="filterTo" onchange="renderSamples()"></div>
+    <button class="btn btn-secondary editor-only" id="bulkReturnBtn" style="display:none" onclick="bulkMarkReturned()">✔ Mark Selected Returned</button>
   </div>
   <div class="table-wrap"><table>
-    <thead><tr><th>Salesperson</th><th>Role</th><th>Client / Party</th><th>Distributor</th><th>Article Name</th><th>Color</th><th>Qty</th><th>Issued</th><th>Return By</th><th>Status</th><th>Actions</th></tr></thead>
+    <thead><tr><th class="cb-col editor-only"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th><th>Salesperson</th><th>Role</th><th>Client / Party</th><th>Distributor</th><th>Article Name</th><th>Color</th><th>Qty</th><th>Issued</th><th>Return By</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody id="samplesBody"></tbody>
   </table></div>
 </div>
@@ -487,6 +518,30 @@ function error(msg)  { return ContentService.createTextOutput(JSON.stringify({ok
 </div><!-- end appShell -->
 
 <!-- MODALS -->
+<!-- MODAL: EDIT SAMPLE -->
+<div class="modal-overlay" id="modal-editSample">
+  <div class="modal">
+    <div class="modal-title">Edit Sample Record</div>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <div class="field"><label>Salesperson Name</label><input id="edit-person" type="text"></div>
+      <div class="field"><label>Role</label><select id="edit-role"><option value="SO">SO — Sales Officer</option><option value="RM">RM — Regional Manager</option></select></div>
+      <div class="field"><label>Client / Party</label><input id="edit-party" type="text"></div>
+      <div class="field"><label>Distributor</label><input id="edit-distributor" type="text"></div>
+      <div class="field span2"><label>Article Name(s) — comma separated</label><input id="edit-article" type="text"></div>
+      <div class="field"><label>Color(s) — comma separated</label><input id="edit-color" type="text"></div>
+      <div class="field"><label>Quantity (pairs)</label><input id="edit-qty" type="number" min="1"></div>
+      <div class="field"><label>Issue Date</label><input id="edit-issued" type="date"></div>
+      <div class="field"><label>Expected Return Date</label><input id="edit-return" type="date"></div>
+      <div class="field span2"><label>Notes</label><textarea id="edit-notes"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('editSample')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditSample()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-addTour">
   <div class="modal">
     <div class="modal-title">Create New Tour</div>
@@ -516,7 +571,7 @@ function error(msg)  { return ContentService.createTextOutput(JSON.stringify({ok
   <div class="modal">
     <div class="modal-title">Issue New Sample</div>
     <div class="form-grid">
-      <div class="field"><label>Salesperson Name</label><input id="s-person" type="text" placeholder="e.g. Rahul Sharma"></div>
+      <div class="field autocomplete-wrap"><label>Salesperson Name</label><input id="s-person" type="text" placeholder="e.g. Rahul Sharma" autocomplete="off" oninput="showPersonAC(this,'s-person-ac')"><div class="autocomplete-list" id="s-person-ac" style="display:none"></div></div>
       <div class="field"><label>Role</label><select id="s-role"><option value="SO">SO — Sales Officer</option><option value="RM">RM — Regional Manager</option></select></div>
       <div class="field"><label>Client / Party Name</label><input id="s-party" type="text" placeholder="e.g. Apex Footwear"></div>
       <div class="field"><label>Distributor</label><input id="s-distributor" type="text" placeholder="e.g. Sharma Distributors" oninput="checkDupWarn()"></div>
@@ -623,6 +678,35 @@ function doLogout() {
 // ═══════════════════════════════════════════
 //  DATA STORE
 // ═══════════════════════════════════════════
+// UNDO STACK — stores snapshots before destructive actions
+let undoStack = [];
+let undoTimer = null;
+
+function pushUndo(msg) {
+  undoStack.push({ msg, samples: JSON.parse(JSON.stringify(samples)), sales: JSON.parse(JSON.stringify(sales)), tours: JSON.parse(JSON.stringify(tours)) });
+  if (undoStack.length > 10) undoStack.shift(); // keep last 10
+  showUndo(msg);
+}
+
+function doUndo() {
+  if (!undoStack.length) return;
+  const snap = undoStack.pop();
+  samples = snap.samples; sales = snap.sales; tours = snap.tours;
+  saveAndSync(); renderSamples(); renderSales(); renderTours(); renderDashboard(); updateStats();
+  hideUndo();
+}
+
+function showUndo(msg) {
+  document.getElementById('undoMsg').textContent = 'Undone: ' + msg;
+  document.getElementById('undoToast').classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 8000);
+}
+
+function hideUndo() {
+  document.getElementById('undoToast').classList.remove('show');
+}
+
 let samples = JSON.parse(localStorage.getItem('st_v5_samples') || '[]');
 let sales   = JSON.parse(localStorage.getItem('st_v5_sales')   || '[]');
 let tours   = JSON.parse(localStorage.getItem('st_v5_tours')   || '[]');
@@ -769,6 +853,7 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 //  HELPERS
 // ═══════════════════════════════════════════
 function norm(s){return String(s||'').trim().toLowerCase();}
+function fmtDate(d){if(!d)return'—';const p=String(d).split('-');if(p.length===3&&p[0].length===4)return p[2]+'/'+p[1]+'/'+p[0];return d;}
 function parseDate(v){
   if(!v)return'';
   if(v instanceof Date){if(isNaN(v.getTime()))return'';const y=v.getFullYear();const mo=String(v.getMonth()+1).padStart(2,'0');const d=String(v.getDate()).padStart(2,'0');return y+'-'+mo+'-'+d;}
@@ -825,7 +910,7 @@ function renderDashboard(){
   // active tours
   const atEl=document.getElementById('dash-active-tours');
   atEl.innerHTML=!at.length?'<div class="empty" style="padding:16px"><div class="empty-icon" style="font-size:20px">🗺</div>No active tours</div>':
-    at.slice(0,4).map(t=>`<div class="dash-alert-row"><div><div class="name">${t.person}</div><div class="meta">${t.distributor||t.region||'—'} · ${t.start}→${t.end}</div></div><span class="badge badge-active">Active</span></div>`).join('');
+    at.slice(0,4).map(t=>`<div class="dash-alert-row"><div><div class="name">${t.person}</div><div class="meta">${t.distributor||t.region||'—'} · ${fmtDate(t.start)}→${fmtDate(t.end)}</div></div><span class="badge badge-active">Active</span></div>`).join('');
   // recent
   const ra=document.getElementById('dash-recent');
   const rec=[...samples].sort((a,b)=>(b.issued||'').localeCompare(a.issued||'')).slice(0,5);
@@ -861,7 +946,7 @@ function addTour(){
   saveAndSync();renderTours();closeModal('addTour');
 }
 
-function deleteTour(id){if(!confirm('Delete?'))return;tours=tours.filter(t=>t.id!==id);saveAndSync();renderTours();}
+function deleteTour(id){if(!confirm('Delete?'))return;pushUndo('Delete tour');tours=tours.filter(t=>t.id!==id);saveAndSync();renderTours();}
 function setTourStatus(id,s){const t=tours.find(x=>x.id===id);if(t){t.status=s;saveAndSync();renderTours();}}
 
 function renderTours(){
@@ -886,7 +971,7 @@ function renderTours(){
           <div class="tour-card-sub">${t.distributor||''}${t.region?` · ${t.region}`:''} | ${t.start}${t.end?` → ${t.end}`:''}</div>
           ${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${t.notes}</div>`:''}
         </div>
-        ${isEditor?`<div class="btn-group">${t.status!=='active'?`<button class="btn btn-sm btn-success" onclick="setTourStatus(${tid},'active')">Set Active</button>`:''} ${t.status!=='closed'?`<button class="btn btn-sm btn-secondary" onclick="setTourStatus(${tid},'closed')">Close</button>`:''}<button class="btn btn-sm btn-danger" onclick="deleteTour(${tid})">✕</button></div>`:''}
+        ${isEditor?`<div class="btn-group">${t.status!=='active'?`<button class="btn btn-sm btn-success" onclick="setTourStatus(${tid},'active')">Set Active</button>`:''} ${t.status!=='closed'?`<button class="btn btn-sm btn-secondary" onclick="setTourStatus(${tid},'closed')">Close</button>`:''}<button class="btn btn-sm btn-secondary" onclick="printTourBriefing(${tid})">🖨 Print</button><button class="btn btn-sm btn-danger" onclick="deleteTour(${tid})">✕</button></div>`:''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:4px">LINKED SAMPLES (${ls.length})</div>
       <div class="tour-samples-list">${ls.length?ls.map(s=>`<span class="tag">${(s.articles||[]).join(', ')} <span style="opacity:.5">· ${s.party}</span></span>`).join(''):'<span style="font-size:11px;color:var(--muted)">No samples linked</span>'}</div>
@@ -897,6 +982,23 @@ function renderTours(){
 // ═══════════════════════════════════════════
 //  DUPLICATE ARTICLE WARNING
 // ═══════════════════════════════════════════
+function showPersonAC(input, listId){
+  const q=norm(input.value);
+  const list=document.getElementById(listId);
+  if(!q){list.style.display='none';return;}
+  const names=[...new Set(samples.map(s=>s.person))].filter(n=>norm(n).includes(q)).slice(0,8);
+  if(!names.length){list.style.display='none';return;}
+  list.style.display='block';
+  list.innerHTML=names.map(n=>`<div class="autocomplete-item" onclick="selectAC('${input.id}','${listId}','${n}')">${n}</div>`).join('');
+}
+function selectAC(inputId,listId,val){
+  document.getElementById(inputId).value=val;
+  document.getElementById(listId).style.display='none';
+}
+document.addEventListener('click',e=>{
+  document.querySelectorAll('.autocomplete-list').forEach(l=>{if(!l.contains(e.target))l.style.display='none';});
+});
+
 function checkDupWarn(){
   const dist=norm(document.getElementById('s-distributor').value);
   const artInput=document.getElementById('s-article').value;
@@ -937,10 +1039,45 @@ function confirmReturn(){
   const notes=document.getElementById('r-notes').value;
   if(!date){alert('Enter return date.');return;}
   const s=samples.find(x=>x.id===returnTarget);
-  if(s){s.status='returned';s.actualReturn=date;s.returnNotes=notes;}
+  if(s){pushUndo('Mark returned');s.status='returned';s.actualReturn=date;s.returnNotes=notes;}
   saveAndSync();renderSamples();updateStats();closeModal('markReturn');
 }
-function deleteSample(id){if(!confirm('Delete?'))return;samples=samples.filter(x=>x.id!==id);saveAndSync();renderSamples();updateStats();}
+function deleteSample(id){if(!confirm('Delete this record?'))return;pushUndo('Delete sample');samples=samples.filter(x=>x.id!==id);saveAndSync();renderSamples();updateStats();}
+function openEditSample(id){
+  const s=samples.find(x=>String(x.id)===String(id)||x.id===id);
+  if(!s)return;
+  document.getElementById('edit-id').value=s.id;
+  document.getElementById('edit-person').value=s.person||'';
+  document.getElementById('edit-role').value=s.role||'SO';
+  document.getElementById('edit-party').value=s.party||'';
+  document.getElementById('edit-distributor').value=s.distributor||'';
+  document.getElementById('edit-article').value=(s.articles||[]).join(', ');
+  document.getElementById('edit-color').value=(s.colors||[]).join(', ');
+  document.getElementById('edit-qty').value=s.qty||1;
+  document.getElementById('edit-issued').value=s.issued||'';
+  document.getElementById('edit-return').value=s.returnBy||'';
+  document.getElementById('edit-notes').value=s.notes||'';
+  document.getElementById('modal-editSample').classList.add('open');
+}
+
+function saveEditSample(){
+  const id=document.getElementById('edit-id').value;
+  const s=samples.find(x=>String(x.id)===String(id)||x.id===id);
+  if(!s)return;
+  pushUndo('Edit sample');
+  s.person=document.getElementById('edit-person').value.trim();
+  s.role=document.getElementById('edit-role').value;
+  s.party=document.getElementById('edit-party').value.trim();
+  s.distributor=document.getElementById('edit-distributor').value.trim();
+  s.articles=document.getElementById('edit-article').value.split(',').map(x=>x.trim()).filter(Boolean);
+  s.colors=document.getElementById('edit-color').value.split(',').map(x=>x.trim()).filter(Boolean);
+  s.qty=parseInt(document.getElementById('edit-qty').value)||1;
+  s.issued=document.getElementById('edit-issued').value;
+  s.returnBy=document.getElementById('edit-return').value;
+  s.notes=document.getElementById('edit-notes').value.trim();
+  saveAndSync();renderSamples();closeModal('editSample');
+}
+
 function removeDuplicates(){
   const before=samples.length;
   const seen=new Set();
@@ -961,35 +1098,61 @@ function renderSamples(){
   const q=norm(document.getElementById('sampleSearch')?.value||'');
   const rf=document.getElementById('sampleRoleFilter')?.value||'';
   const sf=document.getElementById('sampleStatusFilter')?.value||'';
+  const fromD=document.getElementById('filterFrom')?.value||'';
+  const toD=document.getElementById('filterTo')?.value||'';
   const body=document.getElementById('samplesBody');
   const isEditor=currentRole==='editor';
   const data=samples.filter(s=>{
     const m=!q||norm(s.person).includes(q)||norm(s.party).includes(q)||(s.articles||[]).some(a=>norm(a).includes(q))||norm(s.distributor).includes(q);
     const st=isOverdue(s)?'overdue':s.status;
-    return m&&(!rf||s.role===rf)&&(!sf||st===sf);
+    const afterFrom=!fromD||s.issued>=fromD;
+    const beforeTo=!toD||s.issued<=toD;
+    return m&&(!rf||s.role===rf)&&(!sf||st===sf)&&afterFrom&&beforeTo;
   });
-  if(!data.length){body.innerHTML=`<tr><td colspan="11"><div class="empty"><div class="empty-icon">📦</div>No samples found</div></td></tr>`;return;}
+  if(!data.length){body.innerHTML=`<tr><td colspan="12"><div class="empty"><div class="empty-icon">📦</div>No samples found</div></td></tr>`;return;}
   body.innerHTML=data.map(s=>{
     const st=isOverdue(s)?'overdue':s.status;
     const badge=st==='returned'?`<span class="badge badge-returned">✓ Returned</span>`:st==='overdue'?`<span class="badge badge-overdue">⚠ Overdue</span>`:`<span class="badge badge-out">→ With Rep</span>`;
     const sid=JSON.stringify(s.id);
     return`<tr>
+      <td class="cb-col">${isEditor&&s.status!=='returned'?`<input type="checkbox" class="row-cb" value="${s.id}" onchange="updateBulkBtn()">`:'&nbsp;'}</td>
       <td><strong>${s.person}</strong></td>
       <td>${s.role==='SO'?`<span class="role-so">● SO</span>`:`<span class="role-rm">● RM</span>`}</td>
       <td>${s.party}</td><td>${s.distributor||'—'}</td>
       <td><div class="tag-list">${(s.articles||[]).map(a=>`<span class="tag">${a}</span>`).join('')}</div></td>
       <td>${s.colors?.length?s.colors.map(c=>`${colorDot(c)}<span style="font-size:11px">${c}</span>`).join(' '):'—'}</td>
       <td class="mono">${s.qty}</td>
-      <td class="mono">${s.issued}</td>
-      <td class="mono">${s.actualReturn||(s.returnBy?`By ${s.returnBy}`:'—')}</td>
+      <td class="mono">${fmtDate(s.issued)}</td>
+      <td class="mono">${s.actualReturn?fmtDate(s.actualReturn):(s.returnBy?`By ${fmtDate(s.returnBy)}`:'—')}</td>
       <td>${badge}</td>
       <td style="display:flex;gap:4px;flex-wrap:wrap;">
         ${isEditor&&s.status!=='returned'?`<button class="btn btn-sm btn-secondary" onclick="openReturn(${sid})">Returned</button>`:''}
+        ${isEditor?`<button class="btn btn-sm btn-secondary" onclick="openEditSample(${sid})" style="color:var(--accent)">✏</button>`:''}
         ${isEditor?`<button class="btn btn-sm btn-danger" onclick="deleteSample(${sid})">✕</button>`:''}
       </td>
     </tr>`;
   }).join('');
   updateStats();
+}
+
+function toggleSelectAll(cb){
+  document.querySelectorAll('.row-cb').forEach(c=>c.checked=cb.checked);
+  updateBulkBtn();
+}
+function updateBulkBtn(){
+  const any=[...document.querySelectorAll('.row-cb')].some(c=>c.checked);
+  const btn=document.getElementById('bulkReturnBtn');
+  if(btn)btn.style.display=any?'':'none';
+}
+function bulkMarkReturned(){
+  const ids=[...document.querySelectorAll('.row-cb:checked')].map(c=>c.value);
+  if(!ids.length)return;
+  if(!confirm(`Mark ${ids.length} sample(s) as returned today?`))return;
+  pushUndo('Bulk mark returned');
+  const today=new Date().toISOString().split('T')[0];
+  ids.forEach(id=>{const s=samples.find(x=>String(x.id)===String(id));if(s){s.status='returned';s.actualReturn=today;s.returnNotes='Bulk return';}});
+  saveAndSync();renderSamples();updateStats();
+  document.getElementById('bulkReturnBtn').style.display='none';
 }
 function handleSampleExcel(event){
   const file=event.target.files[0];if(!file)return;
@@ -1015,6 +1178,7 @@ function handleSampleExcel(event){
         samples.push({id:Date.now()+Math.random(),person,role,party,distributor,articles:artRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),colors:colorRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),qty,issued:issued||new Date().toISOString().split('T')[0],returnBy,notes,status:'out',actualReturn:null,returnNotes:''});
         added++;
       });
+      pushUndo('Bulk upload '+added+' samples');
       saveAndSync();renderSamples();updateStats();
       const b=document.getElementById('sampleImportBanner');
       b.style.display='block';b.innerHTML=`✅ <strong>${added} records imported.</strong>${skipped?` <span style="color:var(--danger)">${skipped} skipped.</span>`:''}`;
@@ -1040,7 +1204,7 @@ function addSale(){
   saveAndSync();renderSales();closeModal('addSale');
   ['sl-person','sl-party','sl-distributor','sl-article','sl-color','sl-qty','sl-amount'].forEach(id=>document.getElementById(id).value='');
 }
-function deleteSale(id){if(!confirm('Delete?'))return;sales=sales.filter(x=>x.id!==id);saveAndSync();renderSales();}
+function deleteSale(id){if(!confirm('Delete?'))return;pushUndo('Delete sale');sales=sales.filter(x=>x.id!==id);saveAndSync();renderSales();}
 function renderSales(){
   const body=document.getElementById('salesBody');
   const isEditor=currentRole==='editor';
@@ -1113,6 +1277,32 @@ function renderAnalysisRMTable(){
   if(!analysisResultsRM.length){body.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div>No RM data yet.</div></td></tr>`;return;}
   body.innerHTML=analysisResultsRM.map(r=>{const mc=r.newArticlePct>=20&&r.newArticlePct<=60?'high':r.newArticlePct<20?'low':'mid';return`<tr><td><strong>${r.person}</strong><br><span style="font-size:10px;color:var(--muted)">${r.totalSamples} records</span></td><td class="mono">${r.distsVisited.length||'—'}</td><td class="mono">${r.uniqueArts.length}</td><td class="mono" style="color:var(--success)">${r.newArticles.length}</td><td>${scoreBar(r.newArticlePct,mc)}</td><td>${scoreBar(r.distConvRate,scoreClass(r.distConvRate))}</td><td><div class="score-bar"><div class="score-track"><div class="score-fill ${scoreClass(r.score)}" style="width:${r.score}%"></div></div><span class="score-num" style="font-weight:700;color:${scoreColor(r.score)}">${r.score}</span></div></td><td>${verdictBadge(r.score)}</td></tr>`;}).join('');
 }
+function printTourBriefing(id){
+  const t=tours.find(x=>x.id===id||String(x.id)===String(id));
+  if(!t)return;
+  const ls=samples.filter(s=>t.sampleIds?.includes(String(s.id))||t.sampleIds?.includes(s.id));
+  const w=window.open('','_blank','width=800,height=600');
+  w.document.write(`<!DOCTYPE html><html><head><title>Tour Briefing — ${t.person}</title>
+  <style>body{font-family:Arial,sans-serif;padding:32px;color:#111;}h1{font-size:22px;margin-bottom:4px;}h2{font-size:14px;color:#666;font-weight:normal;margin-bottom:24px;}table{width:100%;border-collapse:collapse;margin-top:16px;}th{background:#f0ede0;padding:8px 10px;text-align:left;font-size:12px;border:1px solid #ccc;}td{padding:8px 10px;font-size:12px;border:1px solid #ccc;}tr:nth-child(even){background:#fafafa;}.meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:#f8f8f2;padding:14px;border-radius:6px;margin-bottom:20px;font-size:13px;}.meta-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}.footer{margin-top:28px;font-size:11px;color:#aaa;text-align:right;}@media print{button{display:none}}</style>
+  </head><body>
+  <h1>Tour Briefing: ${t.person}</h1>
+  <h2>${t.role==='SO'?'Sales Officer':'Regional Manager'} · ${t.distributor||''} ${t.region?'· '+t.region:''}</h2>
+  <div class="meta">
+    <div><div class="meta-label">Start Date</div>${fmtDate(t.start)||'—'}</div>
+    <div><div class="meta-label">End Date</div>${fmtDate(t.end)||'—'}</div>
+    <div><div class="meta-label">Status</div>${t.status.toUpperCase()}</div>
+    <div style="grid-column:span 3"><div class="meta-label">Notes / Objectives</div>${t.notes||'—'}</div>
+  </div>
+  <strong style="font-size:13px">Samples Carried (${ls.length})</strong>
+  <table><tr><th>#</th><th>Article(s)</th><th>Color(s)</th><th>Qty</th><th>Party</th><th>Issued</th><th>Return By</th><th>Status</th></tr>
+  ${ls.map((s,i)=>`<tr><td>${i+1}</td><td>${(s.articles||[]).join(', ')}</td><td>${(s.colors||[]).join(', ')||'—'}</td><td>${s.qty}</td><td>${s.party}</td><td>${fmtDate(s.issued)}</td><td>${fmtDate(s.returnBy)||'—'}</td><td>${s.status.toUpperCase()}</td></tr>`).join('')}
+  </table>
+  <div class="footer">Generated by SoleTrack · ${new Date().toLocaleDateString('en-IN')}</div>
+  <br><button onclick="window.print()" style="margin-top:12px;padding:8px 18px;background:#e8c547;border:none;border-radius:6px;font-weight:700;cursor:pointer">🖨 Print this page</button>
+  </body></html>`);
+  w.document.close();
+}
+
 function switchAnalysisTab(tab,el){document.querySelectorAll('#page-analysis .inner-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('analysis-so').style.display=tab==='so'?'block':'none';document.getElementById('analysis-rm').style.display=tab==='rm'?'block':'none';}
 function exportAnalysisExcel(){
   const wb=XLSX.utils.book_new();
