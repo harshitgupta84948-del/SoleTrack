@@ -277,6 +277,7 @@ textarea{resize:vertical;min-height:60px;}
       <button class="btn btn-secondary editor-only" onclick="downloadSampleTemplate()">⬇ Template</button>
       <button class="btn btn-secondary editor-only" onclick="document.getElementById('sampleXlsx').click()">⬆ Bulk Upload Excel</button>
       <input type="file" id="sampleXlsx" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleSampleExcel(event)">
+      <button class="btn btn-secondary editor-only" onclick="removeDuplicates()">🧹 Remove Duplicates</button>
       <button class="btn btn-primary editor-only" onclick="openModal('addSample')">+ Add Sample</button>
     </div>
   </div>
@@ -496,6 +497,7 @@ function error(msg)  { return ContentService.createTextOutput(JSON.stringify({ok
       <div class="field"><label>Region / City</label><input id="t-region" type="text" placeholder="e.g. North Delhi"></div>
       <div class="field"><label>Tour Start Date</label><input id="t-start" type="date"></div>
       <div class="field"><label>Tour End Date</label><input id="t-end" type="date"></div>
+      <div class="field span2" style="background:rgba(232,197,71,.06);border:1px solid rgba(232,197,71,.2);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--warning)">📅 Set start and end date to define the full tour date range. Overdue is flagged 3 days after the end date.</div>
       <div class="field span2"><label>Status</label><select id="t-status"><option value="planned">Planned</option><option value="active">Active</option><option value="closed">Closed</option></select></div>
       <div class="field span2">
         <label>Link Sample Records</label>
@@ -767,8 +769,23 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 //  HELPERS
 // ═══════════════════════════════════════════
 function norm(s){return String(s||'').trim().toLowerCase();}
-function parseDate(v){if(!v)return'';if(v instanceof Date)return v.toISOString().split('T')[0];if(typeof v==='number'){const d=new Date(Math.round((v-25569)*86400000));return d.toISOString().split('T')[0];}const s=String(v).trim();const p=s.split(/[\/\-\.]/);if(p.length===3){if(p[0].length===4)return`${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`;return`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;}return s;}
-function isOverdue(s){if(s.status==='returned'||!s.returnBy)return false;return new Date(s.returnBy)<new Date();}
+function parseDate(v){
+  if(!v)return'';
+  if(v instanceof Date){if(isNaN(v.getTime()))return'';const y=v.getFullYear();const mo=String(v.getMonth()+1).padStart(2,'0');const d=String(v.getDate()).padStart(2,'0');return y+'-'+mo+'-'+d;}
+  if(typeof v==='number'){const d=new Date(Math.round((v-25569)*86400000));return parseDate(d);}
+  const s=String(v).trim();
+  if(s.includes('T')||s.includes('Z')){try{return parseDate(new Date(s));}catch(e){}}
+  const p=s.split(/[\/\-\.]/);
+  if(p.length===3){if(p[0].length===4)return p[0]+'-'+p[1].padStart(2,'0')+'-'+p[2].padStart(2,'0');return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}
+  return s;
+}
+function isOverdue(s){
+  if(s.status==='returned'||!s.returnBy)return false;
+  // Grace period: 3 days after the return/end date
+  const due=new Date(s.returnBy);
+  due.setDate(due.getDate()+3);
+  return due<new Date();
+}
 const CMAP={black:'#1a1a1a',white:'#f0f0f0',red:'#e85447',blue:'#7b9fe8',navy:'#1a3a6e',green:'#47e8a0',yellow:'#e8c547',brown:'#8B5E3C',grey:'#888',gray:'#888',orange:'#e87d47',pink:'#e87db4',purple:'#c47be8',beige:'#d4b896',tan:'#c9a87c',cream:'#f5e6d0',maroon:'#800020',khaki:'#c8b96e',silver:'#aaa',gold:'#d4af37'};
 function colorDot(c){if(!c)return'';const k=c.split(/[\/,]/)[0].toLowerCase().trim();return`<span class="color-dot" style="background:${CMAP[k]||'#666'}"></span>`;}
 function updateStats(){document.getElementById('stat-total').textContent=samples.length;document.getElementById('stat-so').textContent=samples.filter(s=>s.role==='SO'&&s.status!=='returned').length;document.getElementById('stat-rm').textContent=samples.filter(s=>s.role==='RM'&&s.status!=='returned').length;document.getElementById('stat-overdue').textContent=samples.filter(s=>isOverdue(s)).length;document.getElementById('stat-returned').textContent=samples.filter(s=>s.status==='returned').length;}
@@ -856,7 +873,7 @@ function renderTours(){
     const m=!q||norm(t.person).includes(q)||norm(t.distributor).includes(q)||norm(t.region).includes(q);
     return m&&(!sf||t.status===sf)&&(!rf||t.role===rf);
   }).sort((a,b)=>(b.start||'').localeCompare(a.start||''));
-  if(!data.length){c.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div>No tours found.</div>`;return;}
+  if(!data.length){c.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div style="margin-bottom:12px">No tours yet.</div><button class="btn btn-primary editor-only" onclick="openModal('addTour')" style="margin:0 auto;display:block">+ Create your first tour</button></div>`;return;}
   const isEditor=currentRole==='editor';
   c.innerHTML=data.map(t=>{
     const ls=samples.filter(s=>t.sampleIds?.includes(String(s.id))||t.sampleIds?.includes(s.id));
@@ -924,6 +941,22 @@ function confirmReturn(){
   saveAndSync();renderSamples();updateStats();closeModal('markReturn');
 }
 function deleteSample(id){if(!confirm('Delete?'))return;samples=samples.filter(x=>x.id!==id);saveAndSync();renderSamples();updateStats();}
+function removeDuplicates(){
+  const before=samples.length;
+  const seen=new Set();
+  samples=samples.filter(s=>{
+    // Key = person + party + articles joined + issued date
+    const key=norm(s.person)+'|'+norm(s.party)+'|'+(s.articles||[]).map(norm).sort().join(',')+'+'+s.issued;
+    if(seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+  const removed=before-samples.length;
+  if(removed===0){alert('No duplicate entries found.');return;}
+  saveAndSync();renderSamples();updateStats();
+  alert('✅ Removed '+removed+' duplicate entry'+(removed>1?'s':'')+'. '+samples.length+' records remain.');
+}
+
 function renderSamples(){
   const q=norm(document.getElementById('sampleSearch')?.value||'');
   const rf=document.getElementById('sampleRoleFilter')?.value||'';
@@ -969,7 +1002,7 @@ function handleSampleExcel(event){
       rows.forEach(row=>{
         const r={};Object.keys(row).forEach(k=>{r[k.toLowerCase().trim().replace(/\s+/g,'_')]=row[k];});
         const person=String(r.salesperson||r.person||r.rep||'').trim();
-        const role=String(r.role||r.designation||'SO').trim().toUpperCase().includes('RM')?'RM':'SO';
+        const roleVal=String(r.role||r['role_(so_or_rm)']||r.designation||'SO').trim().toUpperCase();const role=roleVal.includes('RM')?'RM':'SO';
         const party=String(r.party||r.client||r.customer||'').trim();
         const distributor=String(r.distributor||r.dist||'').trim();
         const artRaw=String(r.article||r.article_name||r.articles||r.style||'').trim();
@@ -1024,7 +1057,7 @@ function handleSalesUpload(event){
       let added=0;
       rows.forEach(row=>{
         const r={};Object.keys(row).forEach(k=>{r[k.toLowerCase().trim().replace(/\s+/g,'_')]=row[k];});
-        const person=String(r.salesperson||r.person||r.rep||'').trim();const role=String(r.role||r.designation||'SO').trim().toUpperCase().includes('RM')?'RM':'SO';const party=String(r.party||r.client||r.customer||'').trim();const distributor=String(r.distributor||r.dist||'').trim();const article=String(r.article||r.article_name||r.style||r.sku||'').trim();const color=String(r.color||r.colour||'').trim();const qty=parseInt(r.quantity||r.qty||0)||0;const amount=parseFloat(r.amount||r.value||0)||0;const date=parseDate(r.sale_date||r.date||'');
+        const person=String(r.salesperson||r.person||r.rep||'').trim();const roleVal=String(r.role||r['role_(so_or_rm)']||r.designation||'SO').trim().toUpperCase();const role=roleVal.includes('RM')?'RM':'SO';const party=String(r.party||r.client||r.customer||'').trim();const distributor=String(r.distributor||r.dist||'').trim();const article=String(r.article||r.article_name||r.style||r.sku||'').trim();const color=String(r.color||r.colour||'').trim();const qty=parseInt(r.quantity||r.qty||0)||0;const amount=parseFloat(r.amount||r.value||0)||0;const date=parseDate(r.sale_date||r.date||'');
         if(person&&party&&article){sales.push({id:Date.now()+Math.random(),person,role,party,distributor,article,color,qty,amount,date});added++;}
       });
       saveAndSync();renderSales();alert(`✅ ${added} sale records imported.`);
