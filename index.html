@@ -664,7 +664,7 @@ function startApp() {
     loadConfig();
     pullFromSheet(); // load latest on open
   }
-  renderDashboard(); renderSamples(); renderSales(); updateStats();
+  sanitizeData(); renderDashboard(); renderSamples(); renderSales(); updateStats();
 }
 
 function doLogout() {
@@ -714,7 +714,26 @@ let returnTarget = null;
 let analysisResultsSO = [];
 let analysisResultsRM = [];
 
+function cleanISODate(v){
+  if(!v)return'';
+  const s=String(v).trim();
+  if(s.includes('T'))return s.split('T')[0];
+  return s;
+}
+
+function sanitizeData(){
+  // Clean any ISO datetime strings stored in date fields
+  samples.forEach(s=>{
+    s.issued=cleanISODate(s.issued);
+    s.returnBy=cleanISODate(s.returnBy);
+    s.actualReturn=cleanISODate(s.actualReturn);
+  });
+  sales.forEach(s=>{s.date=cleanISODate(s.date);});
+  tours.forEach(t=>{t.start=cleanISODate(t.start);t.end=cleanISODate(t.end);});
+}
+
 function saveLocal() {
+  sanitizeData();
   localStorage.setItem('st_v5_samples', JSON.stringify(samples));
   localStorage.setItem('st_v5_sales',   JSON.stringify(sales));
   localStorage.setItem('st_v5_tours',   JSON.stringify(tours));
@@ -760,7 +779,7 @@ async function pullFromSheet() {
       sales   = json.data.sales   || [];
       tours   = json.data.tours   || [];
       saveLocal();
-      renderDashboard(); renderSamples(); renderSales(); renderTours(); updateStats();
+      sanitizeData(); renderDashboard(); renderSamples(); renderSales(); renderTours(); updateStats();
       if (currentRole === 'viewer') document.getElementById('syncStatus').textContent = '✅ Live — updated ' + new Date().toLocaleTimeString();
       if (currentRole === 'editor') setEditorSync('✅ Loaded from Google Sheets', 'var(--success)');
     }
@@ -853,7 +872,19 @@ window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overla
 //  HELPERS
 // ═══════════════════════════════════════════
 function norm(s){return String(s||'').trim().toLowerCase();}
-function fmtDate(d){if(!d)return'—';const p=String(d).split('-');if(p.length===3&&p[0].length===4)return p[2]+'/'+p[1]+'/'+p[0];return d;}
+function fmtDate(d){
+  if(!d||d==='—')return'—';
+  let s=String(d).trim();
+  // If it contains T (ISO datetime), extract just the date part first
+  if(s.includes('T'))s=s.split('T')[0];
+  // Now s should be YYYY-MM-DD
+  const p=s.split('-');
+  if(p.length===3&&p[0].length===4&&!isNaN(p[1])&&!isNaN(p[2])){
+    return p[2].substring(0,2)+'/'+p[1]+'/'+p[0];
+  }
+  // Already in DD/MM/YYYY or other format — return as is
+  return s;
+}
 function parseDate(v){
   if(!v)return'';
   if(v instanceof Date){if(isNaN(v.getTime()))return'';const y=v.getFullYear();const mo=String(v.getMonth()+1).padStart(2,'0');const d=String(v.getDate()).padStart(2,'0');return y+'-'+mo+'-'+d;}
