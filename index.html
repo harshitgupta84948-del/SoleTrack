@@ -197,6 +197,29 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
 .date-filter input{width:130px;min-width:unset;}
 /* PRINT */
 @media print{header,#undoToast,.btn-group,.search-row,.nav-tabs,.header-right,#viewerBanner,#editorSyncBar{display:none!important;}.page{display:block!important;}}
+/* AI INSIGHTS PANEL */
+.ai-panel{background:linear-gradient(135deg,rgba(14,14,15,0.9) 0%,rgba(23,23,24,0.95) 100%);border:1px solid rgba(232,197,71,.25);border-radius:12px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden;}
+.ai-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--rm),var(--so));}
+.ai-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.ai-panel-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--accent);display:flex;align-items:center;gap:8px;}
+.ai-insight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.ai-insight-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;}
+.ai-insight-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.ai-insight-label.art{color:var(--accent);}
+.ai-insight-label.rep{color:var(--so);}
+.ai-insight-label.color{color:var(--rm);}
+.ai-insight-label.bundle{color:var(--accent2);}
+.ai-insight-label.season{color:var(--success);}
+.ai-insight-label.party{color:#e8e447;}
+.ai-insight-body{font-size:12px;color:var(--text);line-height:1.6;}
+.ai-insight-body strong{color:var(--accent);}
+.ai-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:16px 0;}
+.ai-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite;}
+.ai-loading-dot:nth-child(2){animation-delay:.2s;}
+.ai-loading-dot:nth-child(3){animation-delay:.4s;}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8);}50%{opacity:1;transform:scale(1.2);}}
+.ai-timestamp{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;}
+.ai-empty{text-align:center;padding:24px;color:var(--muted);font-size:13px;}
 </style>
 </head>
 <body>
@@ -273,6 +296,21 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
     <div class="dash-panel"><div class="dash-panel-title">🔴 Zero-Conversion Articles</div><div id="dash-zero-conv"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:22px">📦</div>No data yet</div></div></div>
     <div class="dash-panel"><div class="dash-panel-title">🗺 Active Tours</div><div id="dash-active-tours"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:22px">🗺</div>No active tours</div></div></div>
     <div class="dash-panel"><div class="dash-panel-title">📅 Recent Activity</div><div id="dash-recent"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:22px">📋</div>No recent activity</div></div></div>
+  </div>
+</div>
+
+  <!-- AI INSIGHTS PANEL -->
+  <div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+      <div class="ai-panel-title">🤖 AI Insights <span style="font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;color:var(--muted);letter-spacing:0">— Pattern Analysis by Claude</span></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="ai-timestamp" id="aiTimestamp"></span>
+        <button class="btn btn-secondary" onclick="runAIInsights(true)" style="font-size:11px;padding:4px 12px;">🔄 Refresh Insights</button>
+      </div>
+    </div>
+    <div id="aiInsightsBody">
+      <div class="ai-empty">Upload sales data and samples to generate AI-powered insights. Insights auto-update when you upload new data.</div>
+    </div>
   </div>
 </div>
 
@@ -914,6 +952,8 @@ function scoreBar(v,c){return`<div class="score-bar"><div class="score-track"><d
 //  DASHBOARD
 // ═══════════════════════════════════════════
 function renderDashboard(){
+  // Trigger AI insights (uses cache if available, fetches fresh if manual)
+  runAIInsights(false);
   const ov=samples.filter(s=>isOverdue(s));
   const at=tours.filter(t=>t.status==='active');
   const sampledArts=[...new Set(samples.flatMap(s=>s.articles||[]).map(norm))];
@@ -1210,7 +1250,7 @@ function handleSampleExcel(event){
         added++;
       });
       pushUndo('Bulk upload '+added+' samples');
-      saveAndSync();renderSamples();updateStats();
+      saveAndSync();renderSamples();updateStats();runAIInsights(true);
       const b=document.getElementById('sampleImportBanner');
       b.style.display='block';b.innerHTML=`✅ <strong>${added} records imported.</strong>${skipped?` <span style="color:var(--danger)">${skipped} skipped.</span>`:''}`;
       setTimeout(()=>b.style.display='none',6000);
@@ -1255,7 +1295,7 @@ function handleSalesUpload(event){
         const person=String(r.salesperson||r.person||r.rep||'').trim();const roleVal=String(r.role||r['role_(so_or_rm)']||r.designation||'SO').trim().toUpperCase();const role=roleVal.includes('RM')?'RM':'SO';const party=String(r.party||r.client||r.customer||'').trim();const distributor=String(r.distributor||r.dist||'').trim();const article=String(r.article||r.article_name||r.style||r.sku||'').trim();const color=String(r.color||r.colour||'').trim();const qty=parseInt(r.quantity||r.qty||0)||0;const amount=parseFloat(r.amount||r.value||0)||0;const date=parseDate(r.sale_date||r.date||'');
         if(person&&party&&article){sales.push({id:Date.now()+Math.random(),person,role,party,distributor,article,color,qty,amount,date});added++;}
       });
-      saveAndSync();renderSales();alert(`✅ ${added} sale records imported.`);
+      saveAndSync();renderSales();runAIInsights(true);alert(`✅ ${added} sale records imported.`);
     }catch(err){alert('Error: '+err.message);}
     event.target.value='';
   };
@@ -1332,6 +1372,172 @@ function printTourBriefing(id){
   <br><button onclick="window.print()" style="margin-top:12px;padding:8px 18px;background:#e8c547;border:none;border-radius:6px;font-weight:700;cursor:pointer">🖨 Print this page</button>
   </body></html>`);
   w.document.close();
+}
+
+// ═══════════════════════════════════════════
+//  AI INSIGHTS ENGINE (Claude API)
+// ═══════════════════════════════════════════
+let aiInsightsCache = JSON.parse(localStorage.getItem('st_ai_insights') || 'null');
+let aiRunning = false;
+
+async function runAIInsights(manual=false) {
+  if (aiRunning) return;
+  if (!manual && aiInsightsCache) { renderAIInsights(aiInsightsCache); return; }
+  if (sales.length < 3 && samples.length < 3) {
+    document.getElementById('aiInsightsBody').innerHTML = '<div class="ai-empty">Not enough data yet. Upload at least a few sales and sample records to generate insights.</div>';
+    return;
+  }
+
+  aiRunning = true;
+  document.getElementById('aiInsightsBody').innerHTML = `
+    <div class="ai-loading">
+      <div class="ai-loading-dot"></div><div class="ai-loading-dot"></div><div class="ai-loading-dot"></div>
+      <span>Claude is analysing your data patterns…</span>
+    </div>`;
+
+  // Build compact data summary for Claude
+  const distSales = {};
+  sales.forEach(s => {
+    const k = norm(s.distributor||s.party||'unknown');
+    if (!distSales[k]) distSales[k] = {};
+    const a = norm(s.article);
+    distSales[k][a] = (distSales[k][a]||0) + (s.qty||1);
+  });
+
+  const colorSales = {};
+  sales.forEach(s => {
+    const k = norm(s.distributor||s.party||'unknown');
+    if (!colorSales[k]) colorSales[k] = {};
+    const c = norm(s.color||'unknown');
+    colorSales[k][c] = (colorSales[k][c]||0) + (s.qty||1);
+  });
+
+  const repConv = {};
+  samples.forEach(s => {
+    if (!repConv[s.person]) repConv[s.person] = {sampled:[], sold:[], role:s.role};
+    (s.articles||[]).forEach(a => repConv[s.person].sampled.push(norm(a)));
+  });
+  sales.forEach(s => {
+    if (repConv[s.person]) repConv[s.person].sold.push(norm(s.article));
+  });
+
+  const monthSales = {};
+  sales.forEach(s => {
+    if (!s.date) return;
+    const m = String(s.date).substring(0,7);
+    if (!monthSales[m]) monthSales[m] = {};
+    const a = norm(s.article);
+    monthSales[m][a] = (monthSales[m][a]||0) + (s.qty||1);
+  });
+
+  const partySales = {};
+  sales.forEach(s => {
+    const p = norm(s.party);
+    if (!partySales[p]) partySales[p] = {};
+    const a = norm(s.article);
+    partySales[p][a] = (partySales[p][a]||0) + (s.qty||1);
+  });
+
+  // Article bundles — co-occurring articles in same salesperson's sales to same party
+  const bundles = {};
+  const repPartySales = {};
+  sales.forEach(s => {
+    const k = norm(s.person)+'|'+norm(s.party);
+    if (!repPartySales[k]) repPartySales[k] = [];
+    repPartySales[k].push(norm(s.article));
+  });
+  Object.values(repPartySales).forEach(arts => {
+    const unique = [...new Set(arts)];
+    for (let i=0;i<unique.length;i++) for (let j=i+1;j<unique.length;j++) {
+      const key = [unique[i],unique[j]].sort().join(' + ');
+      bundles[key] = (bundles[key]||0)+1;
+    }
+  });
+
+  const topBundles = Object.entries(bundles).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topDistSales = Object.entries(distSales).slice(0,6).map(([d,arts])=>`${d}: ${Object.entries(arts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([a,q])=>a+'('+q+')').join(', ')}`);
+  const topColors = Object.entries(colorSales).slice(0,5).map(([d,cols])=>`${d}: ${Object.entries(cols).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c,q])=>c+'('+q+')').join(', ')}`);
+  const topMonths = Object.entries(monthSales).sort().slice(-6).map(([m,arts])=>`${m}: ${Object.entries(arts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([a,q])=>a+'('+q+')').join(', ')}`);
+  const topParties = Object.entries(partySales).sort((a,b)=>Object.values(b[1]).reduce((x,y)=>x+y,0)-Object.values(a[1]).reduce((x,y)=>x+y,0)).slice(0,5).map(([p,arts])=>`${p}: ${Object.entries(arts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([a,q])=>a+'('+q+')').join(', ')}`);
+  const repSummary = Object.entries(repConv).map(([name,d])=>{
+    const conv = d.sampled.filter(a=>d.sold.includes(a)).length;
+    return `${name}(${d.role}): sampled ${d.sampled.length} articles, converted ${conv}`;
+  });
+
+  const prompt = `You are a sales pattern analyst for Starkidz, an Indian footwear brand. Analyse the following data from their sample management system and generate specific, actionable insights. Be concise, data-driven, and use the actual article names and numbers from the data.
+
+SALES BY DISTRIBUTOR/AREA (article: qty sold):
+${topDistSales.join('\n')||'No data'}
+
+COLOR PERFORMANCE BY AREA:
+${topColors.join('\n')||'No data'}
+
+SALESPERSON CONVERSION:
+${repSummary.join('\n')||'No data'}
+
+ARTICLE BUNDLES (articles sold together to same party):
+${topBundles.map(([b,c])=>b+' ('+c+' times)').join('\n')||'No data'}
+
+MONTHLY SALES TRENDS:
+${topMonths.join('\n')||'No data'}
+
+PARTY/RETAILER BUYING PATTERNS:
+${topParties.join('\n')||'No data'}
+
+Respond ONLY with a valid JSON object (no markdown, no preamble) with exactly these 6 keys:
+{
+  "articles": "2-3 sentences on which articles sell best where and what samples reps should prioritise",
+  "reps": "2-3 sentences on which rep's sample kit approach is most effective and what others should copy",
+  "colors": "2-3 sentences on color preferences by area and how to tailor sample kit colors",
+  "bundles": "2-3 sentences on article combinations that sell together and should be sampled as a pair",
+  "seasonal": "2-3 sentences on monthly/seasonal patterns and when to push which articles",
+  "parties": "2-3 sentences on which party types buy which articles and how to personalise sample visits"
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(b=>b.text||'').join('').trim();
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    parsed._timestamp = new Date().toLocaleString('en-IN');
+    aiInsightsCache = parsed;
+    localStorage.setItem('st_ai_insights', JSON.stringify(parsed));
+    renderAIInsights(parsed);
+  } catch(err) {
+    document.getElementById('aiInsightsBody').innerHTML = `<div class="ai-empty" style="color:var(--danger)">⚠ Could not generate insights: ${err.message}. Make sure you have an internet connection and try refreshing.</div>`;
+  }
+  aiRunning = false;
+}
+
+function renderAIInsights(data) {
+  if (!data) return;
+  const cards = [
+    { key:'articles', label:'Top Articles by Area', cls:'art', icon:'📦' },
+    { key:'reps',     label:'Best Sample Kit Approach', cls:'rep', icon:'👤' },
+    { key:'colors',   label:'Color Preferences by Area', cls:'color', icon:'🎨' },
+    { key:'bundles',  label:'Article Bundle Patterns', cls:'bundle', icon:'🔗' },
+    { key:'seasonal', label:'Seasonal Trends', cls:'season', icon:'📅' },
+    { key:'parties',  label:'Party Buying Patterns', cls:'party', icon:'🏪' },
+  ];
+  document.getElementById('aiInsightsBody').innerHTML = `
+    <div class="ai-insight-grid">
+      ${cards.map(c=>`
+        <div class="ai-insight-card">
+          <div class="ai-insight-label ${c.cls}">${c.icon} ${c.label}</div>
+          <div class="ai-insight-body">${data[c.key]||'Insufficient data for this pattern.'}</div>
+        </div>`).join('')}
+    </div>
+    <div class="ai-timestamp">Last analysed: ${data._timestamp||'—'}</div>`;
+  if (data._timestamp) document.getElementById('aiTimestamp').textContent = 'Last: '+data._timestamp;
 }
 
 function switchAnalysisTab(tab,el){document.querySelectorAll('#page-analysis .inner-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('analysis-so').style.display=tab==='so'?'block':'none';document.getElementById('analysis-rm').style.display=tab==='rm'?'block':'none';}
