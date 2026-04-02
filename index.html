@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -175,6 +176,54 @@ textarea{resize:vertical;min-height:60px;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  header{flex-wrap:wrap;gap:8px;padding:12px 14px;}
+  .nav-tabs{flex-wrap:wrap;gap:2px;order:3;width:100%;}
+  .nav-tab{padding:5px 10px;font-size:11px;}
+  .header-right{gap:6px;}
+  main{padding:14px;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .dash-grid{grid-template-columns:1fr;}
+  .dash-grid.thirds{grid-template-columns:1fr;}
+  .rec-cards{grid-template-columns:1fr;}
+  .ai-insight-grid{grid-template-columns:1fr;}
+  .btn-group{flex-wrap:wrap;}
+  .search-row{flex-wrap:wrap;}
+  .search-input{max-width:100%;width:100%;}
+  .filter-select{width:100%;}
+  .date-filter{flex-wrap:wrap;}
+  .modal{padding:18px;width:96vw;}
+  .form-grid{grid-template-columns:1fr;}
+  .field.span2{grid-column:span 1;}
+  table{font-size:12px;}
+  th,td{padding:8px 8px;}
+  .logo{font-size:20px;}
+  .stat-value{font-size:28px;}
+}
+/* ARTICLE MASTER */
+.master-table{width:100%;border-collapse:collapse;}
+.master-table th{background:var(--surface2);padding:9px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.master-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+/* KIT RECOMMENDER */
+.kit-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
+.kit-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.kit-title{font-weight:600;font-size:14px;}
+.kit-articles{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.kit-article{background:rgba(232,197,71,.1);border:1px solid rgba(232,197,71,.3);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'DM Mono',monospace;color:var(--accent);}
+.kit-article.new{background:rgba(71,232,160,.1);border-color:rgba(71,232,160,.3);color:var(--success);}
+.kit-article.avoid{background:rgba(232,84,71,.1);border-color:rgba(232,84,71,.3);color:var(--danger);text-decoration:line-through;}
+.kit-reason{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;}
+/* REPORT CARD */
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.report-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.report-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
+.report-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.report-metric{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;}
+.report-metric-val{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
+.report-metric-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+.wa-btn{background:#25D366;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.wa-btn:hover{background:#1da851;}
 /* UNDO TOAST */
 #undoToast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px 20px;display:flex;align-items:center;gap:14px;font-size:13px;z-index:9999;transition:transform .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5);}
 #undoToast.show{transform:translateX(-50%) translateY(0);}
@@ -195,8 +244,54 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
 /* DATE RANGE FILTER */
 .date-filter{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
 .date-filter input{width:130px;min-width:unset;}
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  header{flex-wrap:wrap;gap:8px;padding:10px 14px;}
+  .nav-tabs{flex-wrap:wrap;gap:2px;order:3;width:100%;}
+  .nav-tab{padding:6px 10px;font-size:11px;}
+  .header-right{order:2;}
+  main{padding:14px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .dash-grid{grid-template-columns:1fr;}
+  .dash-grid.thirds{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .field.span2{grid-column:span 1;}
+  .btn-group{gap:4px;}
+  .btn{padding:7px 11px;font-size:11px;}
+  .search-row{flex-wrap:wrap;}
+  .search-input{max-width:100%;width:100%;}
+  .filter-select{width:100%;}
+  .date-filter{flex-wrap:wrap;}
+  .modal{padding:18px;}
+  .ai-insight-grid{grid-template-columns:1fr;}
+  .rec-cards{grid-template-columns:1fr;}
+  #undoToast{width:90vw;bottom:16px;}
+  .table-wrap{font-size:12px;}
+  th,td{padding:8px 8px;}
+}
 /* PRINT */
 @media print{header,#undoToast,.btn-group,.search-row,.nav-tabs,.header-right,#viewerBanner,#editorSyncBar{display:none!important;}.page{display:block!important;}}
+/* REPORT CARD */
+.rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+.rc-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.rc-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.rc-name{font-weight:700;font-size:16px;}
+.rc-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.rc-stat{background:var(--surface2);border-radius:7px;padding:10px;text-align:center;}
+.rc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
+.rc-stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+/* KIT RECOMMENDER */
+.kit-card{background:var(--surface);border:1px solid rgba(232,197,71,.3);border-radius:10px;padding:18px;margin-bottom:12px;}
+.kit-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.kit-title{font-weight:700;font-size:14px;}
+.kit-articles{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.kit-tag{padding:4px 10px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;}
+.kit-tag.must{background:rgba(71,232,160,.12);color:var(--success);border:1px solid rgba(71,232,160,.3);}
+.kit-tag.try{background:rgba(232,197,71,.1);color:var(--accent);border:1px solid rgba(232,197,71,.25);}
+.kit-tag.avoid{background:rgba(232,84,71,.1);color:var(--danger);border:1px solid rgba(232,84,71,.25);}
+/* MASTER LIST */
+.master-tag{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-family:'DM Mono',monospace;margin:3px;}
+.master-tag .del-alias{color:var(--danger);cursor:pointer;font-size:14px;line-height:1;}
 /* AI INSIGHTS PANEL */
 .ai-panel{background:linear-gradient(135deg,rgba(14,14,15,0.9) 0%,rgba(23,23,24,0.95) 100%);border:1px solid rgba(232,197,71,.25);border-radius:12px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden;}
 .ai-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--rm),var(--so));}
@@ -262,13 +357,16 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
 
 <header>
   <div><div class="logo">SoleTrack <span>FOOTWEAR SAMPLE MANAGEMENT</span></div></div>
-  <nav class="nav-tabs">
+  <nav class="nav-tabs" id="mainNav">
     <button class="nav-tab active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-tab" onclick="showPage('tours',this)">🗺 Tours</button>
     <button class="nav-tab" onclick="showPage('samples',this)">📦 Samples</button>
     <button class="nav-tab" onclick="showPage('sales',this)">📊 Sales Data</button>
     <button class="nav-tab" onclick="showPage('analysis',this)">🎯 Analysis</button>
     <button class="nav-tab" onclick="showPage('training',this)">🏅 Training</button>
+    <button class="nav-tab" onclick="showPage('kit',this)">💡 Kit Rec</button>
+    <button class="nav-tab" onclick="showPage('reports',this)">📋 Reports</button>
+    <button class="nav-tab" onclick="showPage('master',this)">📚 Articles</button>
     <button class="nav-tab" id="setupTab" onclick="showPage('setup',this)" style="color:var(--accent)">⚙ Setup</button>
   </nav>
   <div class="header-right">
@@ -320,7 +418,7 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
     <div class="section-title">Tour / Visit Tracker</div>
     <button class="btn btn-primary editor-only" onclick="openModal('addTour')">+ Create Tour</button>
   </div>
-  <div class="alert alert-info">💡 A Tour links a rep to a distributor visit, date range, and the samples they carried — connecting samples → tour → sales for precise analysis.</div>
+  <div class="alert alert-info">💡 Tours are <strong>auto-generated</strong> each time you upload a sample Excel — one tour per salesperson per batch. You can also create manual tours. <span style="color:var(--accent)">AUTO</span> badge = auto-generated.</div>
   <div class="search-row">
     <input class="search-input" type="text" placeholder="Search rep, distributor…" id="tourSearch" oninput="renderTours()">
     <select class="filter-select" id="tourStatusFilter" onchange="renderTours()"><option value="">All Status</option><option value="planned">Planned</option><option value="active">Active</option><option value="closed">Closed</option></select>
@@ -426,6 +524,51 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:po
   </div>
   <div id="training-so"><div class="rec-cards" id="trainingSOCards"><div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏅</div>Run analysis first</div></div></div>
   <div id="training-rm" style="display:none;"><div class="rec-cards" id="trainingRMCards"><div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏅</div>Run analysis first</div></div></div>
+</div>
+
+<!-- KIT RECOMMENDER PAGE -->
+<div class="page" id="page-kit">
+  <div class="section-header">
+    <div class="section-title">💡 Sample Kit Recommender</div>
+    <button class="btn btn-primary" onclick="runKitRec()">▶ Generate Recommendations</button>
+  </div>
+  <div class="alert alert-info">Based on past sales patterns, this tool suggests which articles each rep should carry for their next tour — and which to avoid (already stocked at distributor).</div>
+  <div id="kitRecBody"><div class="empty"><div class="empty-icon">💡</div>Click Generate to build kit recommendations for all active reps.</div></div>
+</div>
+
+<!-- REPORTS PAGE -->
+<div class="page" id="page-reports">
+  <div class="section-header">
+    <div class="section-title">📋 Reports</div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="exportMonthlySummary()">⬇ Monthly Summary Excel</button>
+      <button class="btn btn-secondary" onclick="runReportCards()">🔄 Refresh Report Cards</button>
+    </div>
+  </div>
+  <div class="search-row">
+    <select class="filter-select" id="reportMonthFilter" style="width:180px">
+      <option value="">All Months</option>
+    </select>
+    <select class="filter-select" id="reportRoleFilter" style="width:160px">
+      <option value="">All Roles</option>
+      <option value="SO">SO Only</option>
+      <option value="RM">RM Only</option>
+    </select>
+  </div>
+  <div class="rc-grid" id="reportCardsBody"><div class="empty"><div class="empty-icon">📋</div>Click Refresh to generate report cards.</div></div>
+</div>
+
+<!-- ARTICLE MASTER LIST PAGE -->
+<div class="page" id="page-master">
+  <div class="section-header">
+    <div class="section-title">📚 Article Master List</div>
+    <div class="btn-group">
+      <button class="btn btn-secondary editor-only" onclick="openModal('addAlias')">+ Add Alias / Merge</button>
+      <button class="btn btn-primary editor-only" onclick="applyAliasesToData()">⚡ Apply to All Data</button>
+    </div>
+  </div>
+  <div class="alert alert-info">💡 Map variant spellings to a canonical name. e.g. "Ranger Pro", "RANGER PRO", "ranger pro" → all become <strong>RANGER PRO</strong>. Click "Apply to All Data" to standardise existing records.</div>
+  <div id="masterListBody"><div class="empty"><div class="empty-icon">📚</div>No articles yet. Upload samples/sales data first.</div></div>
 </div>
 
 <!-- SETUP PAGE -->
@@ -552,10 +695,35 @@ function error(msg)  { return ContentService.createTextOutput(JSON.stringify({ok
   </div>
 </div>
 
+<!-- KIT RECOMMENDER PAGE -->
+
+<!-- REPORTS PAGE -->
+
+<!-- ARTICLE MASTER PAGE -->
+
 </main>
 </div><!-- end appShell -->
 
 <!-- MODALS -->
+<!-- MODAL: ADD ARTICLE -->
+<div class="modal-overlay" id="modal-addArticle">
+  <div class="modal">
+    <div class="modal-title">Add Article to Master List</div>
+    <div class="form-grid">
+      <div class="field span2"><label>Standard Article Name</label><input id="art-name" type="text" placeholder="e.g. RANGER PRO"></div>
+      <div class="field"><label>Category</label>
+        <select id="art-cat"><option value="school">School</option><option value="casual">Casual</option><option value="sports">Sports</option><option value="formal">Formal</option><option value="sandal">Sandal</option><option value="other">Other</option></select>
+      </div>
+      <div class="field"><label>MRP (Rs.)</label><input id="art-mrp" type="number" placeholder="e.g. 499"></div>
+      <div class="field span2"><label>Aliases / Variant Names (comma separated)</label><input id="art-aliases" type="text" placeholder="e.g. ranger pro, RANGERPRO, Ranger-Pro"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('addArticle')">Cancel</button>
+      <button class="btn btn-primary" onclick="addArticle()">Add Article</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: EDIT SAMPLE -->
 <div class="modal-overlay" id="modal-editSample">
   <div class="modal">
@@ -716,6 +884,23 @@ function doLogout() {
 // ═══════════════════════════════════════════
 //  DATA STORE
 // ═══════════════════════════════════════════
+// ARTICLE MASTER LIST
+let articleMaster = JSON.parse(localStorage.getItem('st_v5_articles') || '[]');
+
+function saveArticles(){
+  localStorage.setItem('st_v5_articles', JSON.stringify(articleMaster));
+}
+
+// Normalise an article name using the master list
+function normArticle(name){
+  const n = norm(name);
+  for(const art of articleMaster){
+    if(norm(art.name)===n) return art.name;
+    if((art.aliases||[]).some(a=>norm(a)===n)) return art.name;
+  }
+  return name; // return as-is if not in master
+}
+
 // UNDO STACK — stores snapshots before destructive actions
 let undoStack = [];
 let undoTimer = null;
@@ -887,7 +1072,13 @@ function showPage(p, el) {
   if (p === 'sales')     renderSales();
   if (p === 'analysis')  runAnalysis();
   if (p === 'training')  { runAnalysis(); renderTraining(); }
+  if (p === 'kit')       runKitRec();
+  if (p === 'reports')   { populateMonthFilter(); runReportCards(); }
+  if (p === 'master')    renderMasterList();
   if (p === 'setup')     loadConfig();
+  if (p === 'kit')       { populateKitSelectors(); }
+  if (p === 'reports')   { renderRepCards(); renderOverdueWA(); }
+  if (p === 'master')    renderMasterList();
 }
 
 // ═══════════════════════════════════════════
@@ -1039,7 +1230,7 @@ function renderTours(){
       <div class="tour-card-header">
         <div>
           <div style="display:flex;align-items:center;gap:10px"><div class="tour-card-title">${t.person}</div>${t.role==='SO'?`<span class="role-so">● SO</span>`:`<span class="role-rm">● RM</span>`} ${sb}</div>
-          <div class="tour-card-sub">${t.distributor||''}${t.region?` · ${t.region}`:''} | ${t.start}${t.end?` → ${t.end}`:''}</div>
+          <div class="tour-card-sub">${t.autoGenerated?'<span style="font-family:DM Mono,monospace;font-size:9px;background:rgba(232,197,71,.15);color:var(--accent);border:1px solid rgba(232,197,71,.3);border-radius:4px;padding:1px 6px;margin-right:6px">AUTO</span>':''}${t.region?` · ${t.region}`:''} | ${t.start}${t.end?` → ${t.end}`:''}</div>
           ${t.notes?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${t.notes}</div>`:''}
         </div>
         ${isEditor?`<div class="btn-group">${t.status!=='active'?`<button class="btn btn-sm btn-success" onclick="setTourStatus(${tid},'active')">Set Active</button>`:''} ${t.status!=='closed'?`<button class="btn btn-sm btn-secondary" onclick="setTourStatus(${tid},'closed')">Close</button>`:''}<button class="btn btn-sm btn-secondary" onclick="printTourBriefing(${tid})">🖨 Print</button><button class="btn btn-sm btn-danger" onclick="deleteTour(${tid})">✕</button></div>`:''}
@@ -1233,6 +1424,7 @@ function handleSampleExcel(event){
       const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
       let added=0,skipped=0;
+      const newSampleIds=[];
       rows.forEach(row=>{
         const r={};Object.keys(row).forEach(k=>{r[k.toLowerCase().trim().replace(/\s+/g,'_')]=row[k];});
         const person=String(r.salesperson||r.person||r.rep||'').trim();
@@ -1246,19 +1438,97 @@ function handleSampleExcel(event){
         const returnBy=parseDate(r.expected_return||r.return_date||r.return_by||'');
         const notes=String(r.notes||r.note||r.remarks||'').trim();
         if(!person||!party||!artRaw){skipped++;return;}
-        samples.push({id:Date.now()+Math.random(),person,role,party,distributor,articles:artRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),colors:colorRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),qty,issued:issued||new Date().toISOString().split('T')[0],returnBy,notes,status:'out',actualReturn:null,returnNotes:''});
+        const newSampleId=Date.now()+Math.random();
+        samples.push({id:newSampleId,person,role,party,distributor,articles:artRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),colors:colorRaw.split(/[,;|]+/).map(x=>x.trim()).filter(Boolean),qty,issued:issued||new Date().toISOString().split('T')[0],returnBy,notes,status:'out',actualReturn:null,returnNotes:''});
+        newSampleIds.push(newSampleId);
         added++;
       });
       pushUndo('Bulk upload '+added+' samples');
-      saveAndSync();renderSamples();updateStats();runAIInsights(true);
+      const newTours = autoGenerateTours(newSampleIds);
+      saveAndSync();renderSamples();renderTours();updateStats();runAIInsights(true);
       const b=document.getElementById('sampleImportBanner');
-      b.style.display='block';b.innerHTML=`✅ <strong>${added} records imported.</strong>${skipped?` <span style="color:var(--danger)">${skipped} skipped.</span>`:''}`;
-      setTimeout(()=>b.style.display='none',6000);
+      b.style.display='block';
+      b.innerHTML=`✅ <strong>${added} records imported.</strong> ${newTours>0?`<strong>${newTours} tour(s) auto-generated.</strong> `:''}${skipped?` <span style="color:var(--danger)">${skipped} skipped.</span>`:''}`;
+      setTimeout(()=>b.style.display='none',8000);
     }catch(err){alert('Error: '+err.message);}
     event.target.value='';
   };
   reader.readAsArrayBuffer(file);
 }
+// ═══════════════════════════════════════════
+//  AUTO-GENERATE TOURS FROM UPLOAD BATCH
+// ═══════════════════════════════════════════
+function autoGenerateTours(newSampleIds) {
+  if (!newSampleIds || !newSampleIds.length) return 0;
+
+  // Get the newly uploaded samples
+  const newSamples = samples.filter(s =>
+    newSampleIds.some(id => Math.abs(id - s.id) < 1) // float id match
+  );
+
+  if (!newSamples.length) return 0;
+
+  // Group by salesperson — each upload batch = one tour per salesperson
+  const byPerson = {};
+  newSamples.forEach(s => {
+    const key = norm(s.person);
+    if (!byPerson[key]) byPerson[key] = {
+      person: s.person, role: s.role,
+      samples: [], distributors: new Set(),
+      parties: new Set(), issueDates: [], returnDates: []
+    };
+    byPerson[key].samples.push(s);
+    if (s.distributor) byPerson[key].distributors.add(s.distributor);
+    if (s.party)       byPerson[key].parties.add(s.party);
+    if (s.issued)      byPerson[key].issueDates.push(s.issued);
+    if (s.returnBy)    byPerson[key].returnDates.push(s.returnBy);
+  });
+
+  let created = 0;
+  const uploadBatchLabel = 'Batch ' + new Date().toLocaleDateString('en-IN');
+
+  Object.values(byPerson).forEach(group => {
+    // Find earliest issue date and latest return date
+    const sortedIssue  = group.issueDates.sort();
+    const sortedReturn = group.returnDates.sort();
+    const start   = sortedIssue[0]  || new Date().toISOString().split('T')[0];
+    const end     = sortedReturn[sortedReturn.length-1] || '';
+    const dists   = [...group.distributors].join(', ');
+    const parties = [...group.parties].slice(0,3).join(', ') + (group.parties.size > 3 ? ` +${group.parties.size-3} more` : '');
+
+    // Check if an identical tour (same person + same start date) already exists
+    const exists = tours.some(t =>
+      norm(t.person) === norm(group.person) &&
+      t.start === start &&
+      t.autoGenerated
+    );
+    if (exists) return;
+
+    // Determine status
+    const today = new Date().toISOString().split('T')[0];
+    let status = 'active';
+    if (end && end < today) status = 'closed';
+    if (start > today) status = 'planned';
+
+    tours.push({
+      id: Date.now() + Math.random(),
+      person:      group.person,
+      role:        group.role,
+      distributor: dists,
+      region:      '',
+      start,
+      end,
+      status,
+      notes:       `Auto-generated from ${uploadBatchLabel}. Parties: ${parties}`,
+      sampleIds:   group.samples.map(s => String(s.id)),
+      autoGenerated: true
+    });
+    created++;
+  });
+
+  return created;
+}
+
 function downloadSampleTemplate(){
   const ws=XLSX.utils.aoa_to_sheet([['salesperson','role (SO or RM)','party','distributor','article_name','color','qty','issue_date','expected_return','notes'],['Rahul Sharma','SO','Apex Footwear','Sharma Dist.','Ranger Pro, Storm X','Black/Red, White',4,'01/04/2025','01/05/2025','Summer collection'],['Priya Mehta','RM','City Traders','—','City Walk','Navy',2,'03/04/2025','03/05/2025','New launch']]);
   ws['!cols']=[18,14,18,18,24,16,6,14,16,24].map(w=>({wch:w}));
@@ -1538,6 +1808,353 @@ function renderAIInsights(data) {
     </div>
     <div class="ai-timestamp">Last analysed: ${data._timestamp||'—'}</div>`;
   if (data._timestamp) document.getElementById('aiTimestamp').textContent = 'Last: '+data._timestamp;
+}
+
+
+// ═══════════════════════════════════════════
+//  ARTICLE MASTER LIST
+// ═══════════════════════════════════════════
+function addArticle(){
+  const name=document.getElementById('art-name').value.trim().toUpperCase();
+  const cat=document.getElementById('art-cat').value;
+  const mrp=parseFloat(document.getElementById('art-mrp').value)||0;
+  const aliasRaw=document.getElementById('art-aliases').value.trim();
+  const aliases=aliasRaw.split(',').map(x=>x.trim()).filter(Boolean);
+  if(!name){alert('Article name required.');return;}
+  if(articleMaster.find(a=>norm(a.name)===norm(name))){alert('Article already exists.');return;}
+  articleMaster.push({id:Date.now()+Math.random(),name,cat,mrp,aliases});
+  saveArticles();renderMasterList();closeModal('addArticle');
+  ['art-name','art-aliases','art-mrp'].forEach(id=>document.getElementById(id).value='');
+}
+
+function deleteArticle(id){
+  if(!confirm('Delete from master list?'))return;
+  articleMaster=articleMaster.filter(a=>a.id!==id);
+  saveArticles();renderMasterList();
+}
+
+function autoDetectArticles(){
+  const allArts=[...new Set([
+    ...samples.flatMap(s=>s.articles||[]),
+    ...sales.map(s=>s.article)
+  ].map(a=>a.trim().toUpperCase()).filter(Boolean))];
+  let added=0;
+  allArts.forEach(name=>{
+    if(!articleMaster.find(a=>norm(a.name)===norm(name))){
+      articleMaster.push({id:Date.now()+Math.random(),name,cat:'other',mrp:0,aliases:[]});
+      added++;
+    }
+  });
+  saveArticles();renderMasterList();
+  alert(`✅ Auto-detected ${added} new articles added to master list.`);
+}
+
+function renderMasterList(){
+  const q=norm(document.getElementById('masterSearch')?.value||'');
+  const cat=document.getElementById('masterCat')?.value||'';
+  const body=document.getElementById('masterBody');
+  if(!body)return;
+  // Compute stats per article
+  const sampledCount={}, soldCount={};
+  samples.forEach(s=>(s.articles||[]).forEach(a=>{const k=norm(normArticle(a));sampledCount[k]=(sampledCount[k]||0)+1;}));
+  sales.forEach(s=>{const k=norm(normArticle(s.article));soldCount[k]=(soldCount[k]||0)+(s.qty||1);});
+  let data=articleMaster.filter(a=>{
+    const m=!q||norm(a.name).includes(q)||(a.aliases||[]).some(al=>norm(al).includes(q));
+    return m&&(!cat||a.cat===cat);
+  });
+  if(!data.length){body.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-icon">📚</div>No articles yet. Click Auto-detect to import from your data.</div></td></tr>`;return;}
+  body.innerHTML=data.map(a=>{
+    const sc=sampledCount[norm(a.name)]||0;
+    const sl=soldCount[norm(a.name)]||0;
+    const conv=sc>0?Math.round((sl/sc)*100):'—';
+    const aid=JSON.stringify(a.id);
+    return`<tr>
+      <td><strong>${a.name}</strong></td>
+      <td><span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;color:var(--muted)">${a.cat}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${(a.aliases||[]).join(', ')||'—'}</td>
+      <td class="mono">${sc}</td>
+      <td class="mono">${sl}</td>
+      <td class="mono" style="color:${typeof conv==='number'?(conv>=50?'var(--success)':conv>=25?'var(--warning)':'var(--danger)'):'var(--muted)'}">${typeof conv==='number'?conv+'%':conv}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteArticle(${aid})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  KIT RECOMMENDER
+// ═══════════════════════════════════════════
+function populateKitSelectors(){
+  const persons=[...new Set(samples.map(s=>s.person))].sort();
+  const dists=[...new Set([...samples.map(s=>s.distributor),...sales.map(s=>s.distributor)].filter(Boolean))].sort();
+  const ps=document.getElementById('kit-person');
+  const ds=document.getElementById('kit-dist');
+  if(!ps||!ds)return;
+  ps.innerHTML='<option value="">— Select Rep —</option>'+persons.map(p=>`<option value="${p}">${p}</option>`).join('');
+  ds.innerHTML='<option value="">— Select Distributor —</option>'+dists.map(d=>`<option value="${d}">${d}</option>`).join('');
+}
+
+function buildKitRecommendations(){
+  const person=document.getElementById('kit-person').value;
+  const dist=document.getElementById('kit-dist').value;
+  const results=document.getElementById('kitResults');
+  if(!person&&!dist){results.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>Select at least a rep or distributor.</div>';return;}
+
+  // Articles already stocked/sold at this distributor
+  const distSold=new Set(sales.filter(s=>!dist||norm(s.distributor)===norm(dist)).map(s=>norm(s.article)));
+  // Articles this rep has successfully converted before
+  const repConverted=new Set();
+  if(person){
+    const repSales=sales.filter(s=>norm(s.person)===norm(person));
+    repSales.forEach(s=>repConverted.add(norm(s.article)));
+  }
+  // All articles in master or seen in data
+  const allArts=[...new Set([
+    ...articleMaster.map(a=>a.name),
+    ...sales.map(s=>s.article.toUpperCase()),
+    ...samples.flatMap(s=>(s.articles||[]).map(a=>a.toUpperCase()))
+  ])];
+  // Bundle patterns — articles that co-sell
+  const bundleScore={};
+  const repPartySales={};
+  sales.forEach(s=>{
+    const k=norm(s.person)+'|'+norm(s.party);
+    if(!repPartySales[k])repPartySales[k]=[];
+    repPartySales[k].push(norm(s.article));
+  });
+  Object.values(repPartySales).forEach(arts=>{
+    const u=[...new Set(arts)];
+    for(let i=0;i<u.length;i++)for(let j=i+1;j<u.length;j++){
+      const key=[u[i],u[j]].sort().join('|');
+      bundleScore[key]=(bundleScore[key]||0)+1;
+    }
+  });
+
+  // Score each article
+  const scored=allArts.map(art=>{
+    const n=norm(art);
+    let score=0, reasons=[], flag='carry';
+    // Already stocked at distributor = avoid (SO rule)
+    if(distSold.has(n)){score-=20;flag='avoid';reasons.push('Already stocked at this distributor');}
+    // Rep has converted this before = strong carry
+    if(repConverted.has(n)){score+=30;reasons.push('This rep has converted this article before');}
+    // Has any sales at this distributor = good
+    const distQty=sales.filter(s=>(!dist||norm(s.distributor)===norm(dist))&&norm(s.article)===n).reduce((a,b)=>a+(b.qty||1),0);
+    if(distQty>0){score+=distQty*2;reasons.push(`${distQty} units sold in this area`);}
+    // No sales history = new article (RM opportunity)
+    const totalSales=sales.filter(s=>norm(s.article)===n).reduce((a,b)=>a+(b.qty||1),0);
+    if(totalSales===0){score+=5;flag='new';reasons.push('New article — no prior sales history (good for RM)');}
+    // Bundle boost
+    allArts.forEach(other=>{
+      const bkey=[n,norm(other)].sort().join('|');
+      if(bundleScore[bkey]>1){score+=bundleScore[bkey];reasons.push(`Often sold with ${other}`);}
+    });
+    return{art,score,reasons,flag};
+  });
+
+  const carry=scored.filter(a=>a.flag!=='avoid').sort((a,b)=>b.score-a.score).slice(0,8);
+  const avoid=scored.filter(a=>a.flag==='avoid').slice(0,5);
+  const newArts=carry.filter(a=>a.flag==='new').slice(0,4);
+
+  results.innerHTML=`
+    <div class="kit-card">
+      <div class="kit-header">
+        <div>
+          <div class="kit-title">Recommended Kit${person?' for '+person:''}${dist?' → '+dist:''}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">Top articles to carry based on sales history, conversion patterns, and bundle data</div>
+        </div>
+        <button class="btn btn-secondary" onclick="printKitCard()" style="font-size:11px">🖨 Print Kit</button>
+      </div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--success);letter-spacing:1px;margin-bottom:6px">✓ CARRY THESE (${carry.length})</div>
+      <div class="kit-articles">${carry.map(a=>`<span class="kit-article ${a.flag==='new'?'new':''}" title="${a.reasons.join(' · ')}">${a.art}</span>`).join('')}</div>
+      ${newArts.length?`<div class="kit-reason">🆕 <strong>New launches to introduce:</strong> ${newArts.map(a=>a.art).join(', ')}</div>`:''}
+      ${avoid.length?`
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--danger);letter-spacing:1px;margin-top:14px;margin-bottom:6px">✗ LEAVE BEHIND — Already at distributor (${avoid.length})</div>
+        <div class="kit-articles">${avoid.map(a=>`<span class="kit-article avoid">${a.art}</span>`).join('')}</div>
+        <div class="kit-reason">These articles are already stocked at this distributor point — the rep can use them directly from the distributor during retailer visits.</div>
+      `:''}
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px">
+      <span style="display:inline-block;background:rgba(232,197,71,.1);border:1px solid rgba(232,197,71,.3);border-radius:4px;padding:2px 8px;font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-right:8px">YELLOW</span> Proven article
+      <span style="display:inline-block;background:rgba(71,232,160,.1);border:1px solid rgba(71,232,160,.3);border-radius:4px;padding:2px 8px;font-family:'DM Mono',monospace;font-size:10px;color:var(--success);margin:0 8px">GREEN</span> New launch
+    </div>`;
+}
+
+function printKitCard(){
+  const person=document.getElementById('kit-person').value||'All Reps';
+  const dist=document.getElementById('kit-dist').value||'All Areas';
+  const w=window.open('','_blank');
+  const body=document.getElementById('kitResults').innerHTML;
+  w.document.write(`<!DOCTYPE html><html><head><title>Sample Kit — ${person}</title>
+  <style>body{font-family:Arial,sans-serif;padding:24px;}.kit-article{display:inline-block;background:#f5f0d0;border:1px solid #d4a;border-radius:5px;padding:4px 10px;margin:3px;font-size:13px;}.kit-article.new{background:#d0f5e8;border-color:#47e8a0;}.kit-article.avoid{text-decoration:line-through;background:#fde;border-color:#e85447;}.kit-reason{font-size:11px;color:#666;margin-top:6px;}h2{font-size:16px;}button{display:none}</style>
+  </head><body><h2>Sample Kit Recommendation — ${person} → ${dist}</h2><p style="font-size:12px;color:#888">Generated: ${new Date().toLocaleDateString('en-IN')}</p>${body}</body></html>`);
+  w.document.close();w.print();
+}
+
+// ═══════════════════════════════════════════
+//  REP PERFORMANCE REPORT CARDS
+// ═══════════════════════════════════════════
+function renderRepCards(){
+  const body=document.getElementById('repCardsBody');
+  if(!body)return;
+  runAnalysis();
+  const allReps=[...new Set([...samples.map(s=>s.person),...sales.map(s=>s.person)])];
+  if(!allReps.length){body.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No data yet.</div>';return;}
+  body.innerHTML=allReps.map(person=>{
+    const pSamples=samples.filter(s=>s.person===person);
+    const pSales=sales.filter(s=>s.person===person);
+    const role=pSamples[0]?.role||pSales[0]?.role||'SO';
+    const totalSampled=[...new Set(pSamples.flatMap(s=>s.articles||[]).map(norm))].length;
+    const totalSold=[...new Set(pSales.map(s=>norm(s.article)))].length;
+    const conv=totalSampled>0?Math.round((totalSold/totalSampled)*100):0;
+    const overdue=pSamples.filter(s=>isOverdue(s)).length;
+    const returned=pSamples.filter(s=>s.status==='returned').length;
+    const totalAmt=pSales.reduce((a,b)=>a+(b.amount||0),0);
+    const result=role==='SO'?analysisResultsSO.find(r=>norm(r.person)===norm(person)):analysisResultsRM.find(r=>norm(r.person)===norm(person));
+    const score=result?.score||'—';
+    const scoreCol=typeof score==='number'?scoreColor(score):'var(--muted)';
+    return`<div class="report-card">
+      <div class="report-header">
+        <div>
+          <div class="report-name">${person}</div>
+          <div>${role==='SO'?'<span class="role-so">● Sales Officer</span>':'<span class="role-rm">● Regional Manager</span>'}</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="printRepCard('${person}')" style="font-size:11px">🖨 Print</button>
+        </div>
+      </div>
+      <div class="report-metrics">
+        <div class="report-metric"><div class="report-metric-val" style="color:${scoreCol}">${score}${typeof score==='number'?'':'  '}</div><div class="report-metric-lbl">Eff. Score</div></div>
+        <div class="report-metric"><div class="report-metric-val">${conv}%</div><div class="report-metric-lbl">Conversion</div></div>
+        <div class="report-metric"><div class="report-metric-val" style="color:${overdue>0?'var(--danger)':'var(--success)'}">${overdue}</div><div class="report-metric-lbl">Overdue</div></div>
+        <div class="report-metric"><div class="report-metric-val">Rs.${(totalAmt/1000).toFixed(0)}K</div><div class="report-metric-lbl">Total Sales</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;">
+        <div style="background:var(--surface2);padding:10px;border-radius:7px;"><div style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Samples Issued</div>${pSamples.length} records</div>
+        <div style="background:var(--surface2);padding:10px;border-radius:7px;"><div style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Returned</div>${returned} samples</div>
+        <div style="background:var(--surface2);padding:10px;border-radius:7px;"><div style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Unique Articles Sold</div>${totalSold} articles</div>
+      </div>
+      ${result?`<div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-radius:7px;border-left:3px solid ${scoreCol};font-size:12px;color:var(--muted)">${
+        role==='SO'?(result.unnecessaryPct>30?`⚠ Carrying ${result.unnecessaryPct}% redundant samples — articles already at distributor.`:`✓ Sample selection discipline is good.`)+' '+(result.convRate<50?`Low retail conversion (${result.convRate}%).`:`Retail conversion healthy (${result.convRate}%).`):
+        (result.newArticlePct<20?`⚠ New article mix too low (${result.newArticlePct}%).`:result.newArticlePct>60?`⚠ Over-indexed on new articles (${result.newArticlePct}%).`:`✓ New article mix is balanced (${result.newArticlePct}%).`)+' '+(result.distConvRate<50?`Low distributor conversion (${result.distConvRate}%).`:`Distributor conversion healthy (${result.distConvRate}%).`)
+      }</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function printRepCard(person){
+  const cards=document.getElementById('repCardsBody');
+  const allCards=cards.querySelectorAll('.report-card');
+  let found=null;
+  allCards.forEach(c=>{if(c.querySelector('.report-name')?.textContent===person)found=c;});
+  if(!found)return;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Report Card — ${person}</title>
+  <style>body{font-family:Arial,sans-serif;padding:28px;max-width:800px;}.report-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}.report-metric{background:#f8f8f8;border-radius:8px;padding:12px;text-align:center;}.report-metric-val{font-size:26px;font-weight:700;}.report-metric-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}button{display:none}</style>
+  </head><body><h2>Performance Report Card: ${person}</h2><p style="color:#888;font-size:12px">Generated: ${new Date().toLocaleDateString('en-IN')}</p>${found.innerHTML}</body></html>`);
+  w.document.close();w.print();
+}
+
+// ═══════════════════════════════════════════
+//  OVERDUE WHATSAPP REMINDERS
+// ═══════════════════════════════════════════
+function renderOverdueWA(){
+  const body=document.getElementById('overdueWABody');
+  if(!body)return;
+  const overdueSamples=samples.filter(s=>isOverdue(s));
+  if(!overdueSamples.length){body.innerHTML='<div class="empty"><div class="empty-icon">✅</div>No overdue samples — all good!</div>';return;}
+  // Group by person
+  const byPerson={};
+  overdueSamples.forEach(s=>{
+    if(!byPerson[s.person])byPerson[s.person]={person:s.person,samples:[]};
+    byPerson[s.person].samples.push(s);
+  });
+  body.innerHTML=Object.values(byPerson).map(g=>{
+    const days=Math.max(...g.samples.map(s=>Math.floor((new Date()-new Date(s.returnBy))/86400000)));
+    const artList=g.samples.flatMap(s=>s.articles||[]).join(', ');
+    const msg=`Hi ${g.person}, this is a reminder that the following sample(s) issued to you are overdue for return: ${artList}. Please return them at the earliest. They were due by ${fmtDate(g.samples[0].returnBy)}. Thank you.`;
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <strong style="font-size:14px">${g.person}</strong>
+          <span style="color:var(--danger);font-family:'DM Mono',monospace;font-size:11px;margin-left:10px">${days} days overdue</span>
+        </div>
+        <button class="wa-btn" onclick="copyWAMsg(this,'${encodeURIComponent(msg)}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.523 5.843L.057 23.75l6.052-1.443A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.494-5.184-1.36l-.37-.22-3.596.857.892-3.507-.241-.382A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Copy WhatsApp Message
+        </button>
+      </div>
+      <div style="background:var(--surface2);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6;">${msg}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">${g.samples.length} sample record(s) · Articles: ${artList.substring(0,80)}${artList.length>80?'…':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function copyWAMsg(btn,encoded){
+  const msg=decodeURIComponent(encoded);
+  navigator.clipboard.writeText(msg).then(()=>{
+    const orig=btn.innerHTML;btn.textContent='✅ Copied!';
+    setTimeout(()=>btn.innerHTML=orig,2000);
+  });
+}
+
+function switchReportTab(tab,el){
+  document.querySelectorAll('#page-reports .inner-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('report-cards').style.display=tab==='cards'?'block':'none';
+  document.getElementById('report-overdue').style.display=tab==='overdue'?'block':'none';
+  if(tab==='overdue')renderOverdueWA();
+}
+
+// ═══════════════════════════════════════════
+//  MONTHLY SUMMARY EXPORT
+// ═══════════════════════════════════════════
+function exportMonthlyReport(){
+  const now=new Date();
+  const month=now.toLocaleString('en-IN',{month:'long',year:'numeric'});
+  const wb=XLSX.utils.book_new();
+
+  // Sheet 1: Samples summary
+  const sRows=[['Salesperson','Role','Party','Distributor','Articles','Qty','Issued','Return By','Status']];
+  samples.forEach(s=>sRows.push([s.person,s.role,s.party,s.distributor||'',(s.articles||[]).join(', '),s.qty,fmtDate(s.issued),fmtDate(s.returnBy),isOverdue(s)?'OVERDUE':s.status.toUpperCase()]));
+  const ws1=XLSX.utils.aoa_to_sheet(sRows);
+  ws1['!cols']=[16,8,18,18,28,6,12,12,10].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,ws1,'Samples');
+
+  // Sheet 2: Sales summary
+  const slRows=[['Salesperson','Role','Party','Distributor','Article','Color','Qty','Amount','Date']];
+  sales.forEach(s=>slRows.push([s.person,s.role,s.party,s.distributor||'',s.article,s.color||'',s.qty,s.amount||0,fmtDate(s.date)]));
+  const ws2=XLSX.utils.aoa_to_sheet(slRows);
+  ws2['!cols']=[16,8,18,18,18,10,6,10,12].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,ws2,'Sales');
+
+  // Sheet 3: Overdue
+  const ovRows=[['Salesperson','Role','Articles','Party','Issued','Return By','Days Overdue']];
+  samples.filter(s=>isOverdue(s)).forEach(s=>{
+    const days=Math.floor((new Date()-new Date(s.returnBy))/86400000);
+    ovRows.push([s.person,s.role,(s.articles||[]).join(', '),s.party,fmtDate(s.issued),fmtDate(s.returnBy),days]);
+  });
+  const ws3=XLSX.utils.aoa_to_sheet(ovRows);
+  ws3['!cols']=[16,8,28,18,12,12,12].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,ws3,'Overdue');
+
+  // Sheet 4: Rep Performance
+  runAnalysis();
+  const rpRows=[['Salesperson','Role','Eff. Score','Conversion %','Overdue','Total Sales Rs.','Verdict']];
+  const allReps=[...new Set([...samples.map(s=>s.person),...sales.map(s=>s.person)])];
+  allReps.forEach(person=>{
+    const role=(samples.find(s=>s.person===person)||sales.find(s=>s.person===person)||{}).role||'SO';
+    const result=role==='SO'?analysisResultsSO.find(r=>norm(r.person)===norm(person)):analysisResultsRM.find(r=>norm(r.person)===norm(person));
+    const pSales=sales.filter(s=>s.person===person);
+    const overdue=samples.filter(s=>s.person===person&&isOverdue(s)).length;
+    const totalAmt=pSales.reduce((a,b)=>a+(b.amount||0),0);
+    const conv=result?.convRate||result?.distConvRate||0;
+    rpRows.push([person,role,result?.score||'—',conv,overdue,totalAmt,result?.score>=70?'Effective':result?.score>=45?'Average':result?.score?'Needs Work':'No data']);
+  });
+  const ws4=XLSX.utils.aoa_to_sheet(rpRows);
+  ws4['!cols']=[16,8,10,14,10,16,12].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb,ws4,'Rep Performance');
+
+  XLSX.writeFile(wb,`SoleTrack_Monthly_${now.getFullYear()}_${String(now.getMonth()+1).padStart(2,'0')}.xlsx`);
 }
 
 function switchAnalysisTab(tab,el){document.querySelectorAll('#page-analysis .inner-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('analysis-so').style.display=tab==='so'?'block':'none';document.getElementById('analysis-rm').style.display=tab==='rm'?'block':'none';}
